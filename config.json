@@ -1,0 +1,9 @@
+{
+  "base_directory": "./backup",
+  "wikis": [
+    {
+      "name": "r-backrooms-wiki-cn",
+      "url": "https://r-backrooms-wiki-cn.wikidot.com"
+    }
+  ]
+}
