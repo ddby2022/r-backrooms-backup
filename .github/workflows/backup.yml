@@ -1,0 +1,28 @@
+name: Wikidot Full Backup
+
+on:
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install wikit CLI
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/kakushi-w/wikit/main/install.sh | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Run full backup
+        run: |
+          wikit backup all --config ./config.json
+          
+
+      - name: Upload backup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wikidot-full-backup
+          path: ./backup   # 与 config.json 中的 base_directory 保持一致
