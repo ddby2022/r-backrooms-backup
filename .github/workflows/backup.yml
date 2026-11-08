@@ -20,9 +20,11 @@ jobs:
         run: |
           wikit backup all --config ./config.json
 
-      - name: Compress backup files
+      - name: Compress and Split files
         run: |
           zip -r backup.zip ./backup
+          
+          split -b 90M backup.zip backup.zip.part_
 
       - name: Push to public backup repo
         run: |
@@ -32,11 +34,12 @@ jobs:
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
           
-          cp ../backup.zip .
+          cp ../backup.zip.part_* .
           
-          git add backup.zip
+          git add .
           git commit -m "Auto Backup $(date +'%Y-%m-%d %H:%M')"
           git branch -M main
+          
 
           git remote add origin https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/ddby2022/rbackup.git
           
