@@ -13,7 +13,7 @@ jobs:
 
       - name: Install wikit CLI
         run: |
-          curl -fsSL https://raw.githubusercontent.com/kakushi-w/wikit/main/install.sh | sh
+          curl -fsSL --retry 6 --retry-all-errors --retry-delay 15 --connect-timeout 30 https://raw.githubusercontent.com/kakushi-w/wikit/main/install.sh | sh
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Run full backup
