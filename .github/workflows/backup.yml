@@ -1,4 +1,4 @@
-name: Wikidot Full Backup
+name: Manual Wikidot Backup
 
 on:
   workflow_dispatch:
@@ -13,34 +13,21 @@ jobs:
 
       - name: Install wikit CLI
         run: |
-          curl -fsSL --retry 6 --retry-all-errors --retry-delay 15 --connect-timeout 30 https://raw.githubusercontent.com/kakushi-w/wikit/main/install.sh | sh
+          curl -fsSL --retry 6 --retry-all-errors --retry-delay 15 https://raw.githubusercontent.com/kakushi-w/wikit/main/install.sh | sh
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Run full backup
         run: |
           wikit backup all --config ./config.json
 
-      - name: Compress and Split files
+      - name: Compress backup files
         run: |
           zip -r backup.zip ./backup
-          
-          split -b 90M backup.zip backup.zip.part_
 
-      - name: Push to public backup repo
-        run: |
-          mkdir temp_push
-          cd temp_push
-          git init
-          git config --global user.name "GitHub Action"
-          git config --global user.email "action@github.com"
-          
-          cp ../backup.zip.part_* .
-          
-          git add .
-          git commit -m "Auto Backup $(date +'%Y-%m-%d %H:%M')"
-          git branch -M main
-          
-
-          git remote add origin https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/ddby2022/rbackup.git
-          
-          git push -f origin main
+      - name: Upload to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: backup-${{ github.run_number }}
+          name: 社区数据备份 - 第 ${{ github.run_number }} 次
+          body: 手动触发的全量备份（包含页面、论坛和附件）。
+          files: backup.zip
